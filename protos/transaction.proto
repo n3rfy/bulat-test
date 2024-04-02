@@ -1,0 +1,18 @@
+syntax = 'proto3';
+
+package transaction;
+
+message CalculateUserTotalSumRequest {
+  uint32 user_id = 1;
+  uint32 start_from = 2;
+  uint32 end_from = 3;
+}
+
+message CalculateUserTotalSumResponse {
+  uint32 value = 1;
+  uint32 execution_time = 2;
+}
+
+service Transaction {
+  rpc sum_amount (CalculateUserTotalSumRequest) returns (CalculateUserTotalSumResponse);
+}

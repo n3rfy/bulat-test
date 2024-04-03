@@ -5,10 +5,14 @@ from typing import cast
 
 import grpc
 import psycopg2
+import structlog
 from psycopg2.pool import ThreadedConnectionPool
 
 from src.application.proto import transaction_pb2
 from src.application.proto.transaction_pb2_grpc import TransactionServicer
+
+
+logger: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 
 @dataclass
@@ -45,6 +49,7 @@ class TransactionService(TransactionServicer):
         except psycopg2.Error:
             context.set_details('DATABASE_ERROR')
             context.set_code(grpc.StatusCode.INTERNAL)
+            logger.exception('DATABASE_ERROR')
             return None
 
         if amount is None:

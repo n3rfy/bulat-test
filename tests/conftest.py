@@ -1,10 +1,9 @@
 from concurrent import futures
 
 import grpc
-import psycopg2
-import psycopg2.pool
 import pytest
 import testing.postgresql
+from psycopg2.pool import ThreadedConnectionPool
 
 from src.application.proto.transaction_pb2_grpc import add_TransactionServicer_to_server
 from src.application.service import TransactionService
@@ -19,7 +18,7 @@ def postgresql():
 
 @pytest.fixture(scope='package')
 def db_connection_pool(postgresql: testing.postgresql.Postgresql):
-    db_connection_pool = psycopg2.pool.SimpleConnectionPool(minconn=3, maxconn=10, dsn=postgresql.url())
+    db_connection_pool = ThreadedConnectionPool(minconn=3, maxconn=10, dsn=postgresql.url())
     yield db_connection_pool
     db_connection_pool.closeall()
 
@@ -51,9 +50,9 @@ def create_transaction_table(db_connection_pool):
 
 
 @pytest.fixture(scope='function')
-def grpc_channel(db_connection):
+def grpc_channel(db_connection_pool):
     service = TransactionService(
-        db_connection_factory=lambda: db_connection,
+        db_connection_pool=db_connection_pool,
     )
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     add_TransactionServicer_to_server(service, server)

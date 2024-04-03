@@ -1,8 +1,8 @@
 import asyncio
 import signal
+from collections.abc import Sequence
 from concurrent.futures import Executor
 from typing import Any
-from typing import Sequence
 
 import grpc
 
@@ -23,7 +23,7 @@ class GRPCServer(grpc.aio._server.Server):
         for signal_name in ('SIGINT', 'SIGTERM'):
             loop.add_signal_handler(
                 getattr(signal, signal_name),
-                lambda: asyncio.ensure_future(self._graceful_shutdown())
+                lambda: asyncio.ensure_future(self._graceful_shutdown()),
             )
 
         super().__init__(

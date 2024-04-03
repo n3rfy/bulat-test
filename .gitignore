@@ -1,0 +1,29 @@
+# Скомпилированные/кэшированные/DLL файлы
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Виртуальные окружения
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Кэш Pytest
+.pytest_cache/
+
+# Настройки IntelliJ IDEA
+.idea/
+
+# Настройки директории в macOS
+.DS_Store
+.DS_Store?
+
+# Настройки директории в Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db

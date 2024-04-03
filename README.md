@@ -9,7 +9,8 @@
 - [x] Сборка приложения в контейнеры;
 - [x] Миграции для базы данных;
 - [x] gRPC-приложение;
-- [ ] Тестирование;
+- [x] Тестирование;
+- [ ] Линтер;
 
 ## Запуск
 
@@ -36,6 +37,22 @@ docker compose --project-name test --file deployment/docker-compose.yaml up
 
 1. [1_create_transaction_table.sql](migrations%2Fadd_transaction_table.sql);
 2. [2_populate_transaction_table.sql](migrations%2F2_populate_transaction_table.sql)
+
+## Тестирование
+
+> **Для корректного запуска тестов требуется установленный Docker.**
+
+Установка зависимостей для тестирования:
+
+```shell
+pip install -r requirements-test.txt
+```
+
+Для запуска тестов требуется в корневой директории проекта выполнить команду:
+
+```shell 
+python -m pytest
+```
 
 ## Корректно выполненный запрос
 

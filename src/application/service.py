@@ -32,7 +32,7 @@ class TransactionService(TransactionServicer):
         self._create_db_connection = db_connection_factory
 
     def sum_amount(self, request: CalculateUserTotalSumRequest, context):
-        start_time = time.monotonic()
+        start_time = time.perf_counter()
         if request.start_from > request.end_from:
             context.set_details('INVALID_TIME_RANGE')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -56,7 +56,7 @@ class TransactionService(TransactionServicer):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return None
 
-        execution_time_in_seconds = time.monotonic() - start_time
+        execution_time_in_seconds = time.perf_counter() - start_time
         execution_time_in_milliseconds = int(execution_time_in_seconds * 1000)
 
         return transaction_pb2.CalculateUserTotalSumResponse(

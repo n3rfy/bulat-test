@@ -1,6 +1,7 @@
 import asyncio
 
 import grpc
+import structlog
 from psycopg2.pool import ThreadedConnectionPool
 
 from src.application.configuration import ApplicationConfiguration
@@ -8,14 +9,21 @@ from src.application.proto.transaction_pb2_grpc import add_TransactionServicer_t
 from src.application.service import TransactionService
 from src.database.configuration import DatabaseConfiguration
 from src.grpc_.server import GRPCServer
+from src.log import setup_logging
+
+
+logger: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 
 def on_startup(context: dict):
-    ...
+    context['log_file'] = open('application.log', 'w')
+    setup_logging(log_file=context['log_file'])
+    logger.info('APPLICATION_STARTED')
 
 
 def on_shutdown(context: dict):
-    ...
+    logger.info('APPLICATION_STOPPED')
+    context['log_file'].close()
 
 
 def create_server() -> grpc.aio.Server:

@@ -8,6 +8,7 @@
 
 - [x] gRPC-приложение
 - [x] Миграции для базы данных
+- [x] Логирование
 - [x] Тестирование
 - [x] Линтер
 - [x] Сборка приложения в контейнеры
@@ -44,6 +45,11 @@ docker compose --project-name test --file deployment/docker-compose.yaml up
 
 1. [1_create_transaction_table.sql](migrations%2Fadd_transaction_table.sql)
 2. [2_populate_transaction_table.sql](migrations%2F2_populate_transaction_table.sql)
+
+## Структурированное логирование
+
+С помощью [structlog](https://www.structlog.org/en/stable/) реализовано структурированное логирование в файл
+**application.log** и **stdout**.
 
 ## Тестирование
 

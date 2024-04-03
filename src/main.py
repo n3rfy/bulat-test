@@ -1,4 +1,4 @@
-from concurrent import futures
+import asyncio
 
 import grpc
 from psycopg2.pool import ThreadedConnectionPool
@@ -7,9 +7,18 @@ from src.application.configuration import ApplicationConfiguration
 from src.application.proto.transaction_pb2_grpc import add_TransactionServicer_to_server
 from src.application.service import TransactionService
 from src.database.configuration import DatabaseConfiguration
+from src.grpc_.server import GRPCServer
 
 
-def create_server(configuration: ApplicationConfiguration) -> grpc.Server:
+def on_startup(context: dict):
+    ...
+
+
+def on_shutdown(context: dict):
+    ...
+
+
+def create_server() -> grpc.aio.Server:
     database_configuration = DatabaseConfiguration.from_env()
     db_connection_pool = ThreadedConnectionPool(
         minconn=3,
@@ -24,14 +33,24 @@ def create_server(configuration: ApplicationConfiguration) -> grpc.Server:
         db_connection_pool=db_connection_pool,
     )
 
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    application_configuration = ApplicationConfiguration.from_env()
+    server = GRPCServer(
+        host=application_configuration.host,
+        port=application_configuration.port,
+    )
+    server.on_startup = on_startup
+    server.on_shutdown = on_shutdown
+
     add_TransactionServicer_to_server(service, server)
-    server.add_insecure_port(f'{configuration.host}:{configuration.port}')
+
     return server
 
 
+async def main():
+    server = create_server()
+    await server.start()
+    await server.wait_for_termination()
+
+
 if __name__ == '__main__':
-    application_configuration = ApplicationConfiguration.from_env()
-    server = create_server(configuration=application_configuration)
-    server.start()
-    server.wait_for_termination()
+    asyncio.run(main())

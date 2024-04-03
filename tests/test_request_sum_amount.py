@@ -6,7 +6,7 @@ from src.application.proto import transaction_pb2
 from src.application.proto import transaction_pb2_grpc
 
 
-def test_sum_amount_one_and_one(
+async def test_sum_amount_one_and_one(
         db_connection: connection,
         grpc_channel: grpc.Channel,
         create_transaction_table,
@@ -14,9 +14,9 @@ def test_sum_amount_one_and_one(
     with db_connection.cursor() as cursor:
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2), (1, 1, 2)')
     db_connection.commit()
-    with grpc_channel:
+    async with grpc_channel:
         stub = transaction_pb2_grpc.TransactionStub(grpc_channel)
-        response = stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
+        response = await stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
             user_id=1,
             start_from=1,
             end_from=3,
@@ -24,7 +24,7 @@ def test_sum_amount_one_and_one(
     assert response.value == 2
 
 
-def test_out_of_range_timestamp(
+async def test_out_of_range_timestamp(
         db_connection: connection,
         grpc_channel: grpc.Channel,
         create_transaction_table,
@@ -32,10 +32,10 @@ def test_out_of_range_timestamp(
     with db_connection.cursor() as cursor:
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2), (1, 1, 2)')
     db_connection.commit()
-    with grpc_channel:
+    async with grpc_channel:
         stub = transaction_pb2_grpc.TransactionStub(grpc_channel)
-        with pytest.raises(grpc.RpcError) as exc:
-            stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
+        with pytest.raises(grpc.aio.AioRpcError) as exc:
+            await stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
                 user_id=1,
                 start_from=4,
                 end_from=3,
@@ -43,7 +43,7 @@ def test_out_of_range_timestamp(
         assert exc.value.code() == grpc.StatusCode.INVALID_ARGUMENT
 
 
-def test_not_existing_user(
+async def test_not_existing_user(
         db_connection: connection,
         grpc_channel: grpc.Channel,
         create_transaction_table,
@@ -51,10 +51,10 @@ def test_not_existing_user(
     with db_connection.cursor() as cursor:
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2)')
     db_connection.commit()
-    with grpc_channel:
+    async with grpc_channel:
         stub = transaction_pb2_grpc.TransactionStub(grpc_channel)
-        with pytest.raises(grpc.RpcError) as exc:
-            stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
+        with pytest.raises(grpc.aio.AioRpcError) as exc:
+            await stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
                 user_id=2,
                 start_from=1,
                 end_from=2,

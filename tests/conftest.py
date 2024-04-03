@@ -1,5 +1,3 @@
-from concurrent import futures
-
 import grpc
 import pytest
 import testing.postgresql
@@ -7,6 +5,7 @@ from psycopg2.pool import ThreadedConnectionPool
 
 from src.application.proto.transaction_pb2_grpc import add_TransactionServicer_to_server
 from src.application.service import TransactionService
+from src.grpc_.server import GRPCServer
 
 
 @pytest.fixture(scope='package')
@@ -50,13 +49,12 @@ def create_transaction_table(db_connection_pool):
 
 
 @pytest.fixture(scope='function')
-def grpc_channel(db_connection_pool):
+async def grpc_channel(db_connection_pool):
     service = TransactionService(
         db_connection_pool=db_connection_pool,
     )
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = GRPCServer(host='localhost', port='50501')
     add_TransactionServicer_to_server(service, server)
-    server.add_insecure_port('localhost:50501')
-    server.start()
-    yield grpc.insecure_channel('localhost:50501')
-    server.stop(None)
+    await server.start()
+    yield grpc.aio.insecure_channel('localhost:50501')
+    await server.stop(None)

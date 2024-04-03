@@ -26,7 +26,7 @@ def db_connection_pool(postgresql: testing.postgresql.Postgresql):
 
 @pytest.fixture(scope='function')
 def create_transaction_table(db_connection_pool):
-    with open('migrations/1_create_transaction_table.sql', 'r') as file:
+    with open('migrations/1_create_transaction_table.sql') as file:
         migration = file.read()
     db_connection = db_connection_pool.getconn()
     with db_connection.cursor() as cursor:
@@ -34,7 +34,7 @@ def create_transaction_table(db_connection_pool):
     db_connection.commit()
     db_connection_pool.putconn(db_connection)
     yield
-    with open('migrations/1_drop_transaction_table.sql', 'r') as file:
+    with open('migrations/1_drop_transaction_table.sql') as file:
         migration = file.read()
     db_connection = db_connection_pool.getconn()
     with db_connection.cursor() as cursor:
@@ -46,11 +46,11 @@ def create_transaction_table(db_connection_pool):
 @pytest.fixture(scope='function')
 def create_grpc_server(db_connection_pool):
     service = TransactionService(
-        db_connection_factory=lambda: db_connection_pool.getconn()
+        db_connection_factory=lambda: db_connection_pool.getconn(),
     )
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     add_TransactionServicer_to_server(service, server)
-    server.add_insecure_port(f'localhost:50501')
+    server.add_insecure_port('localhost:50501')
     server.start()
     yield
     server.stop(None)

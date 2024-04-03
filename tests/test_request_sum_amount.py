@@ -15,12 +15,12 @@ def test_sum_amount_one_and_one(
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2), (1, 1, 2)')
     db_connection.commit()
     db_connection_pool.putconn(db_connection)
-    with grpc.insecure_channel(f'localhost:50501') as channel:
+    with grpc.insecure_channel('localhost:50501') as channel:
         stub = transaction_pb2_grpc.TransactionStub(channel)
         response = stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
             user_id=1,
             start_from=1,
-            end_from=3
+            end_from=3,
         ))
     assert response.value == 2
 
@@ -35,13 +35,13 @@ def test_out_of_range_timestamp(
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2), (1, 1, 2)')
     db_connection.commit()
     db_connection_pool.putconn(db_connection)
-    with grpc.insecure_channel(f'localhost:50501') as channel:
+    with grpc.insecure_channel('localhost:50501') as channel:
         stub = transaction_pb2_grpc.TransactionStub(channel)
         with pytest.raises(grpc.RpcError) as exc:
             stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
                 user_id=1,
                 start_from=4,
-                end_from=3
+                end_from=3,
             ))
         assert exc.value.code() == grpc.StatusCode.INVALID_ARGUMENT
 
@@ -56,12 +56,12 @@ def test_not_existing_user(
         cursor.execute(query='insert into transaction (user_id, amount, timestamp) values (1, 1, 2)')
     db_connection.commit()
     db_connection_pool.putconn(db_connection)
-    with grpc.insecure_channel(f'localhost:50501') as channel:
+    with grpc.insecure_channel('localhost:50501') as channel:
         stub = transaction_pb2_grpc.TransactionStub(channel)
         with pytest.raises(grpc.RpcError) as exc:
             stub.sum_amount(transaction_pb2.CalculateUserTotalSumRequest(
                 user_id=2,
                 start_from=1,
-                end_from=2
+                end_from=2,
             ))
         assert exc.value.code() == grpc.StatusCode.INVALID_ARGUMENT

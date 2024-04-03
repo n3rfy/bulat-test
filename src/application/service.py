@@ -1,7 +1,7 @@
 import time
+from collections.abc import Callable
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Callable
-from typing import Mapping
 from typing import cast
 
 import grpc
@@ -36,7 +36,7 @@ class TransactionService(TransactionServicer):
         if request.start_from > request.end_from:
             context.set_details('INVALID_TIME_RANGE')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            return
+            return None
 
         try:
             db_connection = self._create_db_connection()
@@ -49,12 +49,12 @@ class TransactionService(TransactionServicer):
         except psycopg2.Error:
             context.set_details('DATABASE_ERROR')
             context.set_code(grpc.StatusCode.INTERNAL)
-            return
+            return None
 
         if amount is None:
             context.set_details('INVALID_USER_ID')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            return
+            return None
 
         execution_time_in_seconds = time.monotonic() - start_time
         execution_time_in_milliseconds = int(execution_time_in_seconds * 1000)

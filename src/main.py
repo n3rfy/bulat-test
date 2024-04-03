@@ -13,7 +13,7 @@ if __name__ == '__main__':
     database_configuration = DatabaseConfiguration.from_env()
     db_connection_factory = create_db_connection_factory(database_config=database_configuration)
     service = TransactionService(
-        db_connection_factory=db_connection_factory
+        db_connection_factory=db_connection_factory,
     )
 
     application_configuration = ApplicationConfiguration.from_env()

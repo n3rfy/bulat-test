@@ -1,1 +1,2 @@
 drop table transaction;
+drop index transaction_user_id_timestamp_idx;

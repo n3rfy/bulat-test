@@ -47,7 +47,7 @@ docker compose --project-name test --file deployment/docker-compose.yaml up
 Мне не хотелось иметь зависимость от SQLAlchemy и Alembic, поэтому миграции написаны и применяются вручную.
 После того как база данных поднялась, требуется применить миграции:
 
-1. [1_create_transaction_table.sql](migrations%2Fadd_transaction_table.sql)
+1. [1_create_transaction_table.sql](migrations%2F1_create_transaction_table.sql)
 2. [2_populate_transaction_table.sql](migrations%2F2_populate_transaction_table.sql)
 
 ## Структурированное логирование

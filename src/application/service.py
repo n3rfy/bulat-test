@@ -12,14 +12,6 @@ from src.application.proto import transaction_pb2
 from src.application.proto.transaction_pb2_grpc import TransactionServicer
 
 
-CALCULATE_USER_TOTAL_SUM = '''
-select sum(transaction.amount) as sum_amount
-from transaction
-where transaction.user_id = %s
-    and transaction.timestamp between %s and %s
-'''
-
-
 @dataclass
 class CalculateUserTotalSumRequest:
     user_id: str
@@ -42,7 +34,12 @@ class TransactionService(TransactionServicer):
             db_connection = self._create_db_connection()
             with db_connection.cursor() as cursor:
                 cursor.execute(
-                    query=CALCULATE_USER_TOTAL_SUM,
+                    query='''
+                        select sum(transaction.amount) as sum_amount
+                        from transaction
+                        where transaction.user_id = %s
+                            and transaction.timestamp between %s and %s
+                    ''',
                     vars=(request.user_id, request.start_from, request.end_from))
                 amount = cast(Mapping, cursor.fetchone())[0]
             db_connection.close()

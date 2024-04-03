@@ -7,11 +7,46 @@
 ## Реализовано
 
 - [x] gRPC-приложение
+- [x] Корректное завершение приложения (graceful shutdown)
 - [x] Миграции для базы данных
 - [x] Логирование
 - [x] Тестирование
 - [x] Линтер
 - [x] Сборка приложения в контейнеры
+
+## gRPC-приложение
+
+Контракт описан в файле [transaction.proto](protos%2Ftransaction.proto).
+
+### sum_amount
+
+> **Считает общую сумму для всех транзакций во временном диапазоне для определенного пользователя.**
+
+На вход принимает **CalculateUserTotalSumRequest**, где
+
+- user_id - идентификатор пользователя (int32);
+- start_from - от какой даты берутся транзакции (unix time);
+- end_from - до какой даты берутся транзакции (unix time);
+
+```protobuf
+message CalculateUserTotalSumRequest {
+  uint32 user_id = 1;
+  uint32 start_from = 2;
+  uint32 end_from = 3;
+}
+```
+
+Возвращает **CalculateUserTotalSumResponse**, где
+
+- value - сумма всех транзакций (int32);
+- execution_time - время выполнения в миллисекундах (int32);
+
+```protobuf
+message CalculateUserTotalSumResponse {
+  uint32 value = 1;
+  uint32 execution_time = 2;
+}
+```
 
 ## Запуск
 

@@ -29,7 +29,7 @@ def db_connection(db_connection_pool):
     db_connection_pool.putconn(db_connection)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='package')
 def create_transaction_table(db_connection_pool):
     with open('migrations/1_create_transaction_table.sql') as file:
         migration = file.read()

@@ -1,6 +1,5 @@
 import time
 from collections.abc import Mapping
-from dataclasses import dataclass
 from typing import cast
 
 import grpc
@@ -15,18 +14,15 @@ from src.application.proto.transaction_pb2_grpc import TransactionServicer
 logger: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 
-@dataclass
-class CalculateUserTotalSumRequest:
-    user_id: str
-    start_from: str
-    end_from: str
-
-
 class TransactionService(TransactionServicer):
     def __init__(self, db_connection_pool: ThreadedConnectionPool) -> None:
         self._db_connection_pool = db_connection_pool
 
-    def sum_amount(self, request: CalculateUserTotalSumRequest, context):
+    def sum_amount(
+            self,
+            request: transaction_pb2.CalculateUserTotalSumRequest,
+            context: grpc.ServicerContext,
+    ) -> transaction_pb2.CalculateUserTotalSumResponse:
         start_time = time.perf_counter()
         if request.start_from > request.end_from:
             context.set_details('INVALID_TIME_RANGE')
